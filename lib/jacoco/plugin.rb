@@ -62,7 +62,7 @@ module Danger
 
       return unless coverage < minimum_coverage_percentage
 
-      raise "#{jacoco_class.name} has coverage of #{coverage}%. " \
+      fail "#{jacoco_class.name} has coverage of #{coverage}%. " \
               "Improve this to at least #{minimum_coverage_percentage}%"
     end
 
