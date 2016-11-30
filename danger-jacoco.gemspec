@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['anton@malinskiy.com']
   spec.description   = %q{A short description of danger-jacoco.}
   spec.summary       = %q{A longer description of danger-jacoco.}
-  spec.homepage      = 'https://github.com/Anton Malinskiy/danger-jacoco'
+  spec.homepage      = 'https://github.com/Malinskiy/danger-jacoco'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'danger-plugin-api', '~> 1.0'
+  spec.add_runtime_dependency 'nokogiri-happymapper', '~> 0.5'
 
   # General ruby development
   spec.add_development_dependency 'bundler', '~> 1.3'

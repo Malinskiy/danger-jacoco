@@ -1,15 +1,24 @@
 # danger-jacoco
 
-A description of danger-jacoco.
+**danger-jacoco** is the [Danger](https://github.com/danger/danger) plugin of 
+to validate the code coverage of the files changed
 
 ## Installation
 
-    $ gem install danger-jacoco
+```
+sudo gem install danger-jacoco
+```
 
 ## Usage
 
-    Methods and attributes from this plugin are available in
-    your `Dangerfile` under the `jacoco` namespace.
+Add 
+
+```ruby
+jacoco.minimum_coverage_percentage=80
+jacoco.report "path/to/jacoco.xml"
+```
+
+to your `Dangerfile` 
 
 ## Development
 
