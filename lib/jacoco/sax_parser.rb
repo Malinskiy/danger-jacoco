@@ -48,8 +48,7 @@ module Jacoco
       end
     end
 
-    def characters(string)
-    end
+    def characters(string); end
 
     def end_element(name)
       @subelement_index -= 1

@@ -32,10 +32,7 @@ module Danger
     # blah/blah/java/slashed_package/Source.java
     #
     def report(path, delimiter = '/java/')
-      affected_files = @dangerfile.git.modified_files + @dangerfile.git.added_files
-      classes = affected_files
-                           .select { |file| file.end_with? '.java' }
-                           .map { |file| extract_class(file, delimiter) }
+      classes = classes(delimiter)
 
       parser = Jacoco::SAXParser.new(classes)
       Nokogiri::XML::SAX::Parser.new(parser).parse(File.open(path))
@@ -44,6 +41,13 @@ module Danger
         # Check which metrics are available
         report_class(jacoco_class)
       end
+    end
+
+    def classes(delimiter)
+      git = @dangerfile.git
+      affected_files = git.modified_files + git.added_files
+      affected_files.select { |file| file.end_with? '.java' }
+                    .map { |file| extract_class(file, delimiter) }
     end
 
     def report_class(jacoco_class)
@@ -62,8 +66,8 @@ module Danger
 
       return unless coverage < minimum_coverage_percentage
 
-      fail "#{jacoco_class.name} has coverage of #{coverage}%. " \
-              "Improve this to at least #{minimum_coverage_percentage}%"
+      fail("#{jacoco_class.name} has coverage of #{coverage}%. " \
+              "Improve this to at least #{minimum_coverage_percentage}%")
     end
 
     def extract_class(file, java_path_delimiter)

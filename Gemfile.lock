@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    danger-jacoco (0.0.2)
+    danger-jacoco (0.0.3)
       danger-plugin-api (~> 1.0)
       nokogiri-happymapper (~> 0.6)
 
