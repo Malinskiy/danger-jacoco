@@ -32,8 +32,8 @@ module Danger
     # blah/blah/java/slashed_package/Source.java
     #
     def report(path, delimiter = '/java/')
-      classes = @dangerfile.git
-                           .modified_files
+      affected_files = @dangerfile.git.modified_files + @dangerfile.git.added_files
+      classes = affected_files
                            .select { |file| file.end_with? '.java' }
                            .map { |file| extract_class(file, delimiter) }
 
