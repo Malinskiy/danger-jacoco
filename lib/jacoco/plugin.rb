@@ -61,7 +61,7 @@ module Danger
 
       # fail danger if total coveraged is smaller than minimum_project_coverage_percentage
       if total_covered[:covered] < minimum_project_coverage_percentage
-        fail("Total coverage of #{total_covered[:covered]}%. Improve this to as least #{minimum_project_coverage_percentage}")
+        fail("Total coverage of #{total_covered[:covered]}%. Improve this to as least #{minimum_project_coverage_percentage} %")
       end
     end
 
