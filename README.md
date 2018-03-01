@@ -14,7 +14,9 @@ sudo gem install danger-jacoco
 Add 
 
 ```ruby
-jacoco.minimum_coverage_percentage=80
+jacoco.minimum_project_coverage_percentage = 50 # default 0
+jacoco.minimum_class_coverage_percentage = 75 # default 0
+jacoco.files_extension = [".java"] # default [".kt", ".java"]
 jacoco.report "path/to/jacoco.xml"
 ```
 
