@@ -12,8 +12,8 @@ module Danger
     attr_accessor :files_extension
 
     def setup
-      @minimum_project_coverage_percentage = 60 unless minimum_project_coverage_percentage
-      @minimum_class_coverage_percentage = 75 unless minimum_class_coverage_percentage
+      @minimum_project_coverage_percentage = 0 unless minimum_project_coverage_percentage
+      @minimum_class_coverage_percentage = 0 unless minimum_class_coverage_percentage
       @files_extension = [".kt",".java"] unless files_extension
     end
 
