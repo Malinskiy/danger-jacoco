@@ -1,5 +1,4 @@
 require 'jacoco/sax_parser'
-require "oga"
 
 module Danger
   #
@@ -101,11 +100,11 @@ module Danger
 
     # It returns total of project code coverage and an emoji status as well
     def total_coverage(report_path)
-        jacoco_report = Oga.parse_xml(File.open(report_path))
+        jacoco_report = Nokogiri::XML(File.open(report_path))
         
-        report = jacoco_report.xpath('report/counter').select { |item| item.get('type') == "INSTRUCTION" }
-        missed_instructions = report.first.get('missed').to_f
-        covered_instructions = report.first.get('covered').to_f
+        report = jacoco_report.xpath('report/counter').select { |item| item['type'] == "INSTRUCTION" }
+        missed_instructions = report.first['missed'].to_f
+        covered_instructions = report.first['covered'].to_f
         total_instructions = missed_instructions + covered_instructions
         covered_percentage = (covered_instructions * 100 / total_instructions).round(2)
         coverage_status = coverage_status(covered_percentage, minimum_project_coverage_percentage)
