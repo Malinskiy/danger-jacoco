@@ -50,7 +50,7 @@ module Danger
       total_covered = total_coverage(path)
 
       report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
-      report_markdown << "| Classe | Coverage Atual | Meta | Status |\n"
+      report_markdown << "| Class | Covered | Meta | Status |\n"
       report_markdown << "|:---:|:---:|:---:|:---:|\n"
       parser.classes.each do |jacoco_class| # Check metrics for each classes
         rp = report_class(jacoco_class)
