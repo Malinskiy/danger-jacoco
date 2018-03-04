@@ -3,7 +3,7 @@ require 'jacoco/sax_parser'
 module Danger
   #
   # @see  Anton Malinskiy/danger-jacoco
-  # @tags jacoco, coverage, java, android
+  # @tags jacoco, coverage, java, android, kotlin
   #
   class DangerJacoco < Plugin
     attr_accessor :minimum_project_coverage_percentage
@@ -30,20 +30,22 @@ module Danger
     #
     # @path path to the xml output of jacoco
     # @delimiter git.modified_files returns full paths to the
-    # changed files. We need to get the java class from this path to check the
+    # changed files. We need to get the class from this path to check the
     # Jacoco report,
     #
-    # e.g. src/java/com/example/SomeClass.java -> com/example/SomeClass
+    # e.g. src/java/com/example/SomeJavaClass.java -> com/example/SomeJavaClass
+    # e.g. src/kotlin/com/example/SomeKotlinClass.kt -> com/example/SomeKotlinClass
     #
     # The default value supposes that you're using gradle structure,
-    # that is your path to java source files is something like
+    # that is your path to source files is something like
     #
-    # blah/blah/java/slashed_package/Source.java
+    # Java => blah/blah/java/slashed_package/Source.java
+    # Kotlin => blah/blah/kotlin/slashed_package/Source.kt
     #
-    def report(path, delimiter = '/java/')
+    def report(path, delimiter = /\/java\/|\/kotlin\//)
       setup
       classes = classes(delimiter)
-      # puts delimiter
+
       parser = Jacoco::SAXParser.new(classes)
       Nokogiri::XML::SAX::Parser.new(parser).parse(File.open(path))
       
