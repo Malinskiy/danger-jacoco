@@ -53,14 +53,10 @@ module Danger
       report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
       report_markdown << "| Class | Covered | Meta | Status |\n"
       report_markdown << "|:---:|:---:|:---:|:---:|\n"
-      markdown_class(parser, report_markdown)
+      class_coverage_above_minimum = markdown_class(parser, report_markdown)
       markdown(report_markdown)
 
-      return if total_covered[:covered] >= minimum_project_coverage_percentage
-
-      # fail danger if total coveraged is smaller than minimum_project_coverage_percentage
-      covered = total_covered[:covered]
-      raise("Total coverage of #{covered}%. Improve this to as least #{minimum_project_coverage_percentage} %")
+      report_fails(class_coverage_above_minimum, total_covered)
     end
 
     # Select modified and added files in this PR
@@ -113,12 +109,30 @@ module Danger
 
     private
 
+    # rubocop:disable Style/SignalException
+    def report_fails(class_coverage_above_minimum, total_covered)
+      if total_covered[:covered] < minimum_project_coverage_percentage
+        # fail danger if total coverage is smaller than minimum_project_coverage_percentage
+        covered = total_covered[:covered]
+        fail("Total coverage of #{covered}%. Improve this to at least #{minimum_project_coverage_percentage}%")
+      end
+
+      return if class_coverage_above_minimum
+
+      fail("Class coverage is below minimum. Improve to at least #{minimum_class_coverage_percentage}%")
+    end
+
     def markdown_class(parser, report_markdown)
+      class_coverage_above_minimum = true
       parser.classes.each do |jacoco_class| # Check metrics for each classes
         rp = report_class(jacoco_class)
         ln = "| `#{jacoco_class.name}` | #{rp[:covered]}% | #{minimum_class_coverage_percentage}% | #{rp[:status]} |\n"
         report_markdown << ln
+
+        class_coverage_above_minimum &&= rp[:covered] >= minimum_class_coverage_percentage
       end
+
+      class_coverage_above_minimum
     end
   end
 end
