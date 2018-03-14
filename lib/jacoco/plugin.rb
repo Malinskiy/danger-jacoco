@@ -69,10 +69,7 @@ module Danger
 
     # It returns a specific class code coverage and an emoji status as well
     def report_class(jacoco_class)
-      counters       = jacoco_class.counters
-      branch_counter = counters.detect { |e| e.type.eql? 'BRANCH' }
-      line_counter   = counters.detect { |e| e.type.eql? 'LINE' }
-      counter        = branch_counter.nil? ? line_counter : branch_counter
+      counter = coverage_counter(jacoco_class)
       coverage = (counter.covered.fdiv(counter.covered + counter.missed) * 100).floor
       status = coverage_status(coverage, minimum_class_coverage_percentage)
 
@@ -108,6 +105,16 @@ module Danger
     end
 
     private
+
+    def coverage_counter(jacoco_class)
+      counters = jacoco_class.counters
+      branch_counter = counters.detect { |e| e.type.eql? 'BRANCH' }
+      line_counter = counters.detect { |e| e.type.eql? 'LINE' }
+      counter = branch_counter.nil? ? line_counter : branch_counter
+      raise "No coverage data found for #{jacoco_class.name}" if counter.nil?
+
+      counter
+    end
 
     # rubocop:disable Style/SignalException
     def report_fails(class_coverage_above_minimum, total_covered)
