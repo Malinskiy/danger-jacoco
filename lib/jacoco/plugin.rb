@@ -69,7 +69,7 @@ module Danger
 
     # It returns a specific class code coverage and an emoji status as well
     def report_class(jacoco_class)
-      counter = get_counter(jacoco_class)
+      counter = coverage_counter(jacoco_class)
       coverage = (counter.covered.fdiv(counter.covered + counter.missed) * 100).floor
       status = coverage_status(coverage, minimum_class_coverage_percentage)
 
@@ -106,7 +106,7 @@ module Danger
 
     private
 
-    def get_counter(jacoco_class)
+    def coverage_counter(jacoco_class)
       counters = jacoco_class.counters
       branch_counter = counters.detect { |e| e.type.eql? 'BRANCH' }
       line_counter = counters.detect { |e| e.type.eql? 'LINE' }
