@@ -8,11 +8,13 @@ module Danger
   class DangerJacoco < Plugin
     attr_accessor :minimum_project_coverage_percentage
     attr_accessor :minimum_class_coverage_percentage
+    attr_accessor :minimum_class_coverage_percentage_regex
     attr_accessor :files_extension
 
     def setup
       @minimum_project_coverage_percentage = 0 unless minimum_project_coverage_percentage
       @minimum_class_coverage_percentage = 0 unless minimum_class_coverage_percentage
+      @minimum_class_coverage_percentage_regex = {} unless minimum_class_coverage_percentage_regex
       @files_extension = ['.kt', '.java'] unless files_extension
     end
 
@@ -52,7 +54,7 @@ module Danger
 
       report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
       report_markdown << "| Class | Covered | Meta | Status |\n"
-      report_markdown << "|:---:|:---:|:---:|:---:|\n"
+      report_markdown << "|:---|:---:|:---:|:---:|\n"
       class_coverage_above_minimum = markdown_class(parser, report_markdown)
       markdown(report_markdown)
 
@@ -67,14 +69,22 @@ module Danger
                     .map { |file| file.split('.').first.split(delimiter)[1] }
     end
 
+    # It returns a minimum required coverage for a specific class
+    def minimum_coverage(jacoco_class)
+      minimum_class_coverage_percentage_regex.each { |key, value| return value if jacoco_class.name =~ key }
+      minimum_class_coverage_percentage
+    end
+
     # It returns a specific class code coverage and an emoji status as well
     def report_class(jacoco_class)
       counter = coverage_counter(jacoco_class)
       coverage = (counter.covered.fdiv(counter.covered + counter.missed) * 100).floor
-      status = coverage_status(coverage, minimum_class_coverage_percentage)
+      required_coverage = minimum_coverage(jacoco_class)
+      status = coverage_status(coverage, required_coverage)
 
       {
         covered: coverage,
+        required: required_coverage,
         status: status
       }
     end
@@ -126,17 +136,17 @@ module Danger
 
       return if class_coverage_above_minimum
 
-      fail("Class coverage is below minimum. Improve to at least #{minimum_class_coverage_percentage}%")
+      fail('Class coverage is below minimum.')
     end
 
     def markdown_class(parser, report_markdown)
       class_coverage_above_minimum = true
       parser.classes.each do |jacoco_class| # Check metrics for each classes
         rp = report_class(jacoco_class)
-        ln = "| `#{jacoco_class.name}` | #{rp[:covered]}% | #{minimum_class_coverage_percentage}% | #{rp[:status]} |\n"
+        ln = "| `#{jacoco_class.name}` | #{rp[:covered]}% | #{rp[:required]}% | #{rp[:status]} |\n"
         report_markdown << ln
 
-        class_coverage_above_minimum &&= rp[:covered] >= minimum_class_coverage_percentage
+        class_coverage_above_minimum &&= rp[:covered] >= rp[:required]
       end
 
       class_coverage_above_minimum
