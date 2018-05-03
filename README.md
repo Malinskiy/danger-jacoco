@@ -16,6 +16,11 @@ Add
 ```ruby
 jacoco.minimum_project_coverage_percentage = 50 # default 0
 jacoco.minimum_class_coverage_percentage = 75 # default 0
+jacoco.minimum_class_coverage_percentage_regex = {
+    /Activity/ => 60,
+    /Fragment/ => 40,
+    /api\/*Entity/ => 20
+} # default {}, if a class is not in this list minimum_class_coverage_percentage will be used as a default coverage
 jacoco.files_extension = [".java"] # default [".kt", ".java"]
 jacoco.report "path/to/jacoco.xml"
 ```
