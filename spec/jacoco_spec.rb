@@ -15,8 +15,8 @@ module Danger
         @dangerfile = testing_dangerfile
         @my_plugin = @dangerfile.jacoco
 
-        modified_files = ['com/example/CachedRepository.java']
-        added_files = ['Blah.java']
+        modified_files = ['src/java/com/example/CachedRepository.java']
+        added_files = ['src/java/Blah.java']
 
         allow(@dangerfile.git).to receive(:modified_files).and_return(modified_files)
         allow(@dangerfile.git).to receive(:added_files).and_return(added_files)
