@@ -66,7 +66,7 @@ module Danger
       git = @dangerfile.git
       affected_files = git.modified_files + git.added_files
       result = affected_files.select { |file| files_extension.reduce(false) { |state, el| state || file.end_with?(el) } }
-                    .map { |file| file.split('.').first.split(delimiter)[0] }
+                    .map { |file| file.split('.').first.split(delimiter)[1] }
       result
     end
 
