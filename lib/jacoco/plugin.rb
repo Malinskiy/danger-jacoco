@@ -54,7 +54,7 @@ module Danger
 
       report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
       report_markdown << "| Class | Covered | Meta | Status |\n"
-      report_markdown << "|:---:|:---:|:---:|:---:|\n"
+      report_markdown << "|:---|:---:|:---:|:---:|\n"
       class_coverage_above_minimum = markdown_class(parser, report_markdown)
       markdown(report_markdown)
 
@@ -139,7 +139,7 @@ module Danger
       class_coverage_above_minimum = true
       parser.classes.each do |jacoco_class| # Check metrics for each classes
         rp = report_class(jacoco_class)
-        ln = "| `#{jacoco_class.name}` | #{rp[:covered]}% | #{rp[:required_coverage_percentage]}% | #{rp[:status]} |\n"
+        ln = "| #{jacoco_class.name} | #{rp[:covered]}% | #{rp[:required_coverage_percentage]}% | #{rp[:status]} |\n"
         report_markdown << ln
 
         class_coverage_above_minimum &&= rp[:covered] >= rp[:required_coverage_percentage]
