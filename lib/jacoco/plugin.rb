@@ -160,7 +160,7 @@ module Danger
           report_filepath = coverage_report_dir + report_filename
       
           if File.file?(report_filepath)
-              "[#{class_name}](#{coverage_report_url + report_filepath})"
+              "[#{class_name}](#{coverage_report_url + report_filename})"
           else 
               "`#{class_name}`"
           end
