@@ -17,7 +17,7 @@ Add
 jacoco.minimum_project_coverage_percentage = 50 # default 0
 jacoco.minimum_class_coverage_percentage = 75 # default 0
 jacoco.files_extension = [".java"] # default [".kt", ".java"]
-jacoco.report("jacoco/output/dir/jacoco.xml", "http://jacoco-html-reports/")
+jacoco.report("path/to/jacoco.xml", "http://jacoco-html-reports/")
 ```
 
 to your `Dangerfile` 
