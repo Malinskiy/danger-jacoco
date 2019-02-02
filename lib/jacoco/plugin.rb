@@ -29,9 +29,8 @@ module Danger
 
     # This is a fast report based on SAX parser
     #
-    # @coverage_report_dir path to the output of jacoco
-    # @coverage_report_file filename of jacoco xml output
-    # @coverage_report_url URL where html report hosted
+    # @path path to the xml output of jacoco
+    # @report_url URL where html report hosted
     # @delimiter git.modified_files returns full paths to the
     # changed files. We need to get the class from this path to check the
     # Jacoco report,
@@ -45,10 +44,9 @@ module Danger
     # Java => blah/blah/java/slashed_package/Source.java
     # Kotlin => blah/blah/kotlin/slashed_package/Source.kt
     #
-    def report(coverage_report_dir, coverage_report_file, coverage_report_url, delimiter = %r{\/java\/|\/kotlin\/})
+    def report(path, report_url, delimiter = %r{\/java\/|\/kotlin\/})
       setup
       classes = classes(delimiter)
-      path = coverage_report_dir + coverage_report_file
 
       parser = Jacoco::SAXParser.new(classes)
       Nokogiri::XML::SAX::Parser.new(parser).parse(File.open(path))
@@ -58,7 +56,7 @@ module Danger
       report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
       report_markdown << "| Class | Covered | Meta | Status |\n"
       report_markdown << "|:---|:---:|:---:|:---:|\n"
-      class_coverage_above_minimum = markdown_class(parser, report_markdown, coverage_report_dir, coverage_report_url)
+      class_coverage_above_minimum = markdown_class(parser, report_markdown, report_url)
       markdown(report_markdown)
 
       report_fails(class_coverage_above_minimum, total_covered)
@@ -138,11 +136,11 @@ module Danger
     end
     # rubocop:enable Style/SignalException
 
-    def markdown_class(parser, report_markdown, coverage_report_dir, coverage_report_url)
+    def markdown_class(parser, report_markdown, report_url)
       class_coverage_above_minimum = true
       parser.classes.each do |jacoco_class| # Check metrics for each classes
         rp = report_class(jacoco_class)
-        rl = coverage_report_link(jacoco_class.name, coverage_report_dir, coverage_report_url)
+        rl = report_link(jacoco_class.name, report_url)
         ln = "| #{rl} | #{rp[:covered]}% | #{rp[:required_coverage_percentage]}% | #{rp[:status]} |\n"
         report_markdown << ln
 
@@ -152,18 +150,12 @@ module Danger
       class_coverage_above_minimum
     end
 
-    def coverage_report_link(class_name, coverage_report_dir, coverage_report_url)
-      if coverage_report_url.empty?
+    def report_link(class_name, report_url)
+      if report_url.empty?
           "`#{class_name}`"
       else 
-          report_filename = class_name.gsub("/", ".").sub(/\.(?=\w+$)/, '/') + ".html"
-          report_filepath = coverage_report_dir + report_filename
-      
-          if File.file?(report_filepath)
-              "[#{class_name}](#{coverage_report_url + report_filename})"
-          else 
-              "`#{class_name}`"
-          end
+          report_filepath = class_name.gsub(/\/(?=[^\/]*\/.)/, '/') + ".html"
+          "[`#{class_name}`](#{report_url + report_filepath})"
       end
     end
 
