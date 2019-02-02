@@ -25,20 +25,21 @@ module Danger
 
 
       it :report do
-        path_dir = "#{File.dirname(__FILE__)}/fixtures/"
-        path_file = "output_a.xml"
+        path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
         @my_plugin.minimum_project_coverage_percentage = 50
         @my_plugin.minimum_class_coverage_map = { "com/example/CachedRepository" => 100}
 
-        @my_plugin.report(path_dir, path_file, '')
+        @my_plugin.report(path_a, 'http://test.com/')
 
         expect(@dangerfile.status_report[:errors]).to eq(["Total coverage of 32.9%. Improve this to at least 50%",
                                                           "Class coverage is below minimum. Improve to at least 0%"])
-        expect(@dangerfile.status_report[:markdowns][0].message).to include("### JaCoCO Code Coverage 32.9% :warning:")
-        expect(@dangerfile.status_report[:markdowns][0].message).to include("| Class | Covered | Meta | Status |")
-        expect(@dangerfile.status_report[:markdowns][0].message).to include("|:---|:---:|:---:|:---:|")
-        expect(@dangerfile.status_report[:markdowns][0].message).to include("| `com/example/CachedRepository` | 50% | 100% | :warning: |")
+        
+        message = @dangerfile.status_report[:markdowns][0].message                                                  
+        expect(message).to include("### JaCoCO Code Coverage 32.9% :warning:")
+        expect(message).to include("| Class | Covered | Meta | Status |")
+        expect(message).to include("|:---|:---:|:---:|:---:|")
+        expect(message).to include("| [`com/example/CachedRepository`](http://test.com/com.example/CachedRepository.html) | 50% | 100% | :warning: |")
 
       end
 
