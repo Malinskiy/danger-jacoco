@@ -154,7 +154,7 @@ module Danger
       if report_url.empty?
           "`#{class_name}`"
       else 
-          report_filepath = class_name.gsub(/\/(?=[^\/]*\/.)/, '/') + ".html"
+          report_filepath = class_name.gsub(/\/(?=[^\/]*\/.)/, '.') + ".html"
           "[`#{class_name}`](#{report_url + report_filepath})"
       end
     end
