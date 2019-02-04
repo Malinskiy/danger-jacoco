@@ -44,7 +44,7 @@ module Danger
     # Java => blah/blah/java/slashed_package/Source.java
     # Kotlin => blah/blah/kotlin/slashed_package/Source.kt
     #
-    def report(path, report_url, delimiter = %r{\/java\/|\/kotlin\/})
+    def report(path, report_url = '', delimiter = %r{\/java\/|\/kotlin\/})
       setup
       classes = classes(delimiter)
 
