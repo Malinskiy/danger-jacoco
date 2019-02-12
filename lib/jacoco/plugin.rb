@@ -30,6 +30,7 @@ module Danger
     # This is a fast report based on SAX parser
     #
     # @path path to the xml output of jacoco
+    # @report_url URL where html report hosted
     # @delimiter git.modified_files returns full paths to the
     # changed files. We need to get the class from this path to check the
     # Jacoco report,
@@ -43,7 +44,7 @@ module Danger
     # Java => blah/blah/java/slashed_package/Source.java
     # Kotlin => blah/blah/kotlin/slashed_package/Source.kt
     #
-    def report(path, delimiter = %r{\/java\/|\/kotlin\/})
+    def report(path, report_url = '', delimiter = %r{\/java\/|\/kotlin\/})
       setup
       classes = classes(delimiter)
 
@@ -54,8 +55,8 @@ module Danger
 
       report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
       report_markdown << "| Class | Covered | Meta | Status |\n"
-      report_markdown << "|:---:|:---:|:---:|:---:|\n"
-      class_coverage_above_minimum = markdown_class(parser, report_markdown)
+      report_markdown << "|:---|:---:|:---:|:---:|\n"
+      class_coverage_above_minimum = markdown_class(parser, report_markdown, report_url)
       markdown(report_markdown)
 
       report_fails(class_coverage_above_minimum, total_covered)
@@ -135,11 +136,12 @@ module Danger
     end
     # rubocop:enable Style/SignalException
 
-    def markdown_class(parser, report_markdown)
+    def markdown_class(parser, report_markdown, report_url)
       class_coverage_above_minimum = true
       parser.classes.each do |jacoco_class| # Check metrics for each classes
         rp = report_class(jacoco_class)
-        ln = "| `#{jacoco_class.name}` | #{rp[:covered]}% | #{rp[:required_coverage_percentage]}% | #{rp[:status]} |\n"
+        rl = report_link(jacoco_class.name, report_url)
+        ln = "| #{rl} | #{rp[:covered]}% | #{rp[:required_coverage_percentage]}% | #{rp[:status]} |\n"
         report_markdown << ln
 
         class_coverage_above_minimum &&= rp[:covered] >= rp[:required_coverage_percentage]
@@ -147,5 +149,15 @@ module Danger
 
       class_coverage_above_minimum
     end
+
+    def report_link(class_name, report_url)
+      if report_url.empty?
+          "`#{class_name}`"
+      else 
+          report_filepath = class_name.gsub(/\/(?=[^\/]*\/.)/, '.') + ".html"
+          "[`#{class_name}`](#{report_url + report_filepath})"
+      end
+    end
+
   end
 end
