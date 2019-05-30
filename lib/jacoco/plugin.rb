@@ -117,7 +117,7 @@ module Danger
       branch_counter = counters.detect { |e| e.type.eql? 'BRANCH' }
       line_counter = counters.detect { |e| e.type.eql? 'LINE' }
       counter = branch_counter.nil? ? line_counter : branch_counter
-      raise "No coverage data found for #{jacoco_class.name}" if counter.nil?
+      warn "No coverage data found for #{jacoco_class.name}" if counter.nil?
 
       counter
     end
