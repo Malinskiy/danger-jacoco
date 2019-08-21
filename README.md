@@ -15,6 +15,10 @@ Add
 
 ```ruby
 jacoco.minimum_project_coverage_percentage = 50 # default 0
+jacoco.minimum_package_coverage_map = { # default is empty
+  'com/package/' => 55,
+  'com/package/more/specific/' => 15
+}
 jacoco.minimum_class_coverage_percentage = 75 # default 0
 jacoco.files_extension = [".java"] # default [".kt", ".java"]
 jacoco.report("path/to/jacoco.xml", "http://jacoco-html-reports/")
