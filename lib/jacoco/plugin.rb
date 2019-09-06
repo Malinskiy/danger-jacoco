@@ -103,6 +103,7 @@ module Danger
           return coverage
         end
       end
+      return nil
     end
 
     # it returns an emoji for coverage status
