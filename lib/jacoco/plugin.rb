@@ -10,6 +10,7 @@ module Danger
     attr_accessor :minimum_class_coverage_percentage
     attr_accessor :files_extension
     attr_accessor :minimum_class_coverage_map
+    attr_accessor :fail_no_coverage_data_found
 
     def setup
       @minimum_project_coverage_percentage = 0 unless minimum_project_coverage_percentage
@@ -44,7 +45,9 @@ module Danger
     # Java => blah/blah/java/slashed_package/Source.java
     # Kotlin => blah/blah/kotlin/slashed_package/Source.kt
     #
-    def report(path, report_url = '', delimiter = %r{\/java\/|\/kotlin\/})
+    def report(path, report_url = '', delimiter = %r{\/java\/|\/kotlin\/}, fail_no_coverage_data_found: true)
+      @fail_no_coverage_data_found = fail_no_coverage_data_found
+
       setup
       classes = classes(delimiter)
 
@@ -67,22 +70,32 @@ module Danger
       git = @dangerfile.git
       affected_files = git.modified_files + git.added_files
       affected_files.select { |file| files_extension.reduce(false) { |state, el| state || file.end_with?(el) } }
-                    .map { |file| file.split('.').first.split(delimiter)[1] }
+          .map { |file| file.split('.').first.split(delimiter)[1] }
     end
 
     # It returns a specific class code coverage and an emoji status as well
     def report_class(jacoco_class)
-      counter = coverage_counter(jacoco_class)
-      coverage = (counter.covered.fdiv(counter.covered + counter.missed) * 100).floor
-      required_coverage = minimum_class_coverage_map[jacoco_class.name]
-      required_coverage = minimum_class_coverage_percentage if required_coverage.nil?
-      status = coverage_status(coverage, required_coverage)
-
-      {
-        covered: coverage,
-        status: status,
-        required_coverage_percentage: required_coverage
+      report_result = {
+          covered: 'No coverage data found : -',
+          status: ':black_joker:',
+          required_coverage_percentage: 'No coverage data found : -'
       }
+
+      counter = coverage_counter(jacoco_class)
+      unless counter.nil?
+        coverage = (counter.covered.fdiv(counter.covered + counter.missed) * 100).floor
+        required_coverage = minimum_class_coverage_map[jacoco_class.name]
+        required_coverage = minimum_class_coverage_percentage if required_coverage.nil?
+        status = coverage_status(coverage, required_coverage)
+
+        report_result = {
+            covered: coverage,
+            status: status,
+            required_coverage_percentage: required_coverage
+        }
+      end
+
+      report_result
     end
 
     # it returns an emoji for coverage status
@@ -105,8 +118,8 @@ module Danger
       coverage_status = coverage_status(covered_percentage, minimum_project_coverage_percentage)
 
       {
-        covered: covered_percentage,
-        status: coverage_status
+          covered: covered_percentage,
+          status: coverage_status
       }
     end
 
@@ -117,7 +130,16 @@ module Danger
       branch_counter = counters.detect { |e| e.type.eql? 'BRANCH' }
       line_counter = counters.detect { |e| e.type.eql? 'LINE' }
       counter = branch_counter.nil? ? line_counter : branch_counter
-      raise "No coverage data found for #{jacoco_class.name}" if counter.nil?
+
+      if counter.nil?
+        no_coverage_data_found_message = "No coverage data found for #{jacoco_class.name}"
+
+        if @fail_no_coverage_data_found.class == TrueClass
+          raise no_coverage_data_found_message
+        else
+          warn no_coverage_data_found_message
+        end
+      end
 
       counter
     end
@@ -152,10 +174,10 @@ module Danger
 
     def report_link(class_name, report_url)
       if report_url.empty?
-          "`#{class_name}`"
-      else 
-          report_filepath = class_name.gsub(/\/(?=[^\/]*\/.)/, '.') + ".html"
-          "[`#{class_name}`](#{report_url + report_filepath})"
+        "`#{class_name}`"
+      else
+        report_filepath = class_name.gsub(/\/(?=[^\/]*\/.)/, '.') + ".html"
+        "[`#{class_name}`](#{report_url + report_filepath})"
       end
     end
 
