@@ -9,11 +9,13 @@ module Danger
     attr_accessor :minimum_project_coverage_percentage
     attr_accessor :minimum_class_coverage_percentage
     attr_accessor :files_extension
+    attr_accessor :minimum_package_coverage_map
     attr_accessor :minimum_class_coverage_map
 
     def setup
       @minimum_project_coverage_percentage = 0 unless minimum_project_coverage_percentage
       @minimum_class_coverage_percentage = 0 unless minimum_class_coverage_percentage
+      @minimum_package_coverage_map = {} unless minimum_package_coverage_map
       @minimum_class_coverage_map = {} unless minimum_class_coverage_map
       @files_extension = ['.kt', '.java'] unless files_extension
     end
@@ -75,6 +77,7 @@ module Danger
       counter = coverage_counter(jacoco_class)
       coverage = (counter.covered.fdiv(counter.covered + counter.missed) * 100).floor
       required_coverage = minimum_class_coverage_map[jacoco_class.name]
+      required_coverage = package_coverage(jacoco_class.name) if required_coverage.nil?
       required_coverage = minimum_class_coverage_percentage if required_coverage.nil?
       status = coverage_status(coverage, required_coverage)
 
@@ -83,6 +86,24 @@ module Danger
         status: status,
         required_coverage_percentage: required_coverage
       }
+    end
+
+    # it returns the most suitable coverage by package name to class or nil
+    def package_coverage(class_name)
+      path = class_name
+      package_parts = class_name.split('/')
+      package_parts.reverse_each do |item|
+        size = item.size
+        path = path[0...-size]
+        coverage = minimum_package_coverage_map[path]
+        if path.size > 0
+          path = path[0...-1]
+        end
+        if coverage != nil
+          return coverage
+        end
+      end
+      return nil
     end
 
     # it returns an emoji for coverage status
