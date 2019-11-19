@@ -3,6 +3,18 @@
 require 'jacoco/sax_parser'
 
 module Danger
+  # Verify code coverage inside your projects
+  # This is done using the jacoco output
+  # Results are passed out as a table in markdown
+  #
+  # @example Verify coverage
+  #          jacoco.minimum_project_coverage_percentage = 50
+  #
+  # @example Verify coverage per package
+  #          jacoco.minimum_package_coverage_map = { # optional (default is empty)
+  #           'com/package/' => 55,
+  #           'com/package/more/specific/' => 15
+  #          }
   #
   # @see  Anton Malinskiy/danger-jacoco
   # @tags jacoco, coverage, java, android, kotlin
@@ -14,6 +26,7 @@ module Danger
     attr_accessor :minimum_package_coverage_map
     attr_accessor :minimum_class_coverage_map
 
+    # Initialize the plugin with configured parameters or defaults
     def setup
       @minimum_project_coverage_percentage = 0 unless minimum_project_coverage_percentage
       @minimum_class_coverage_percentage = 0 unless minimum_class_coverage_percentage
@@ -58,8 +71,8 @@ module Danger
       total_covered = total_coverage(path)
 
       report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
-      report_markdown << "| Class | Covered | Meta | Status |\n"
-      report_markdown << "|:---|:---:|:---:|:---:|\n"
+      report_markdown += "| Class | Covered | Meta | Status |\n"
+      report_markdown += "|:---|:---:|:---:|:---:|\n"
       class_coverage_above_minimum = markdown_class(parser, report_markdown, report_url)
       markdown(report_markdown)
 
