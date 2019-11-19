@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Jacoco
   # DOM parser for Jacoco report
   class DOMParser
