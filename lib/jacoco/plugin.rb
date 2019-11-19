@@ -1,17 +1,32 @@
+# frozen_string_literal: true
+
 require 'jacoco/sax_parser'
 
 module Danger
+  # Verify code coverage inside your projects
+  # This is done using the jacoco output
+  # Results are passed out as a table in markdown
+  #
+  # @example Verify coverage
+  #          jacoco.minimum_project_coverage_percentage = 50
+  #
+  # @example Verify coverage per package
+  #          jacoco.minimum_package_coverage_map = { # optional (default is empty)
+  #           'com/package/' => 55,
+  #           'com/package/more/specific/' => 15
+  #          }
   #
   # @see  Anton Malinskiy/danger-jacoco
   # @tags jacoco, coverage, java, android, kotlin
   #
-  class DangerJacoco < Plugin
+  class DangerJacoco < Plugin # rubocop:disable Metrics/ClassLength
     attr_accessor :minimum_project_coverage_percentage
     attr_accessor :minimum_class_coverage_percentage
     attr_accessor :files_extension
     attr_accessor :minimum_package_coverage_map
     attr_accessor :minimum_class_coverage_map
 
+    # Initialize the plugin with configured parameters or defaults
     def setup
       @minimum_project_coverage_percentage = 0 unless minimum_project_coverage_percentage
       @minimum_class_coverage_percentage = 0 unless minimum_class_coverage_percentage
@@ -56,8 +71,8 @@ module Danger
       total_covered = total_coverage(path)
 
       report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
-      report_markdown << "| Class | Covered | Meta | Status |\n"
-      report_markdown << "|:---|:---:|:---:|:---:|\n"
+      report_markdown += "| Class | Covered | Meta | Status |\n"
+      report_markdown += "|:---|:---:|:---:|:---:|\n"
       class_coverage_above_minimum = markdown_class(parser, report_markdown, report_url)
       markdown(report_markdown)
 
@@ -96,14 +111,10 @@ module Danger
         size = item.size
         path = path[0...-size]
         coverage = minimum_package_coverage_map[path]
-        if path.size > 0
-          path = path[0...-1]
-        end
-        if coverage != nil
-          return coverage
-        end
+        path = path[0...-1] unless path.empty?
+        return coverage unless coverage.nil?
       end
-      return nil
+      nil
     end
 
     # it returns an emoji for coverage status
@@ -173,12 +184,11 @@ module Danger
 
     def report_link(class_name, report_url)
       if report_url.empty?
-          "`#{class_name}`"
-      else 
-          report_filepath = class_name.gsub(/\/(?=[^\/]*\/.)/, '.') + ".html"
-          "[`#{class_name}`](#{report_url + report_filepath})"
+        "`#{class_name}`"
+      else
+        report_filepath = class_name.gsub(%r{/(?=[^/]*/.)}, '.') + '.html'
+        "[`#{class_name}`](#{report_url + report_filepath})"
       end
     end
-
   end
 end
