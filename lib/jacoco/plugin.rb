@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'jacoco/sax_parser'
 
 module Danger
@@ -5,7 +7,7 @@ module Danger
   # @see  Anton Malinskiy/danger-jacoco
   # @tags jacoco, coverage, java, android, kotlin
   #
-  class DangerJacoco < Plugin
+  class DangerJacoco < Plugin # rubocop:disable Metrics/ClassLength
     attr_accessor :minimum_project_coverage_percentage
     attr_accessor :minimum_class_coverage_percentage
     attr_accessor :files_extension
@@ -96,14 +98,10 @@ module Danger
         size = item.size
         path = path[0...-size]
         coverage = minimum_package_coverage_map[path]
-        if path.size > 0
-          path = path[0...-1]
-        end
-        if coverage != nil
-          return coverage
-        end
+        path = path[0...-1] unless path.empty?
+        return coverage unless coverage.nil?
       end
-      return nil
+      nil
     end
 
     # it returns an emoji for coverage status
@@ -173,12 +171,11 @@ module Danger
 
     def report_link(class_name, report_url)
       if report_url.empty?
-          "`#{class_name}`"
-      else 
-          report_filepath = class_name.gsub(/\/(?=[^\/]*\/.)/, '.') + ".html"
-          "[`#{class_name}`](#{report_url + report_filepath})"
+        "`#{class_name}`"
+      else
+        report_filepath = class_name.gsub(%r{/(?=[^/]*/.)}, '.') + '.html'
+        "[`#{class_name}`](#{report_url + report_filepath})"
       end
     end
-
   end
 end

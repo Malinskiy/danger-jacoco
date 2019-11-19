@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'happymapper'
 require 'jacoco/model/class'
 require 'jacoco/model/sourcefile'
