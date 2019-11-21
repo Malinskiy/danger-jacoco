@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'jacoco/plugin'
 
 require 'jacoco/dom_parser'
