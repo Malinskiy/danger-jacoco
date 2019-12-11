@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'happymapper'
 require 'jacoco/model/counter'
 require 'jacoco/model/method'
