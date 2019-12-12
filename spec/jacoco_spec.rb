@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable LineLength
-
+# rubocop:disable ModuleLength
 # rubocop:disable BlockLength
 
 require File.expand_path('spec_helper', __dir__)
@@ -129,7 +129,7 @@ module Danger
         @my_plugin.minimum_class_coverage_percentage = 80
         @my_plugin.minimum_project_coverage_percentage = 50
 
-        expect{@my_plugin.report(path_a, fail_no_coverage_data_found: true)}.to_not raise_error(RuntimeError)
+        expect { @my_plugin.report(path_a, fail_no_coverage_data_found: true) }.to_not raise_error(RuntimeError)
       end
 
       it 'When option "fail_no_coverage_data_found" is not set, the execution fails on empty data' do
@@ -138,7 +138,7 @@ module Danger
         @my_plugin.minimum_class_coverage_percentage = 80
         @my_plugin.minimum_project_coverage_percentage = 50
 
-        expect{@my_plugin.report path_a}.to raise_error(RuntimeError)
+        expect { @my_plugin.report path_a }.to raise_error(RuntimeError)
       end
 
       it 'When option "fail_no_coverage_data_found" is set to optionally fail, the execution fails on empty data' do
@@ -147,7 +147,7 @@ module Danger
         @my_plugin.minimum_class_coverage_percentage = 80
         @my_plugin.minimum_project_coverage_percentage = 50
 
-        expect{@my_plugin.report path_a, fail_no_coverage_data_found: true}.to raise_error(RuntimeError)
+        expect { @my_plugin.report path_a, fail_no_coverage_data_found: true }.to raise_error(RuntimeError)
       end
 
       it 'When option "fail_no_coverage_data_found" is set to optionally warn (not fail), the execution doesn\'t fail on empty data' do
@@ -156,11 +156,12 @@ module Danger
         @my_plugin.minimum_class_coverage_percentage = 80
         @my_plugin.minimum_project_coverage_percentage = 50
 
-        expect{@my_plugin.report path_a, fail_no_coverage_data_found: false}.to_not raise_error(RuntimeError)
+        expect { @my_plugin.report path_a, fail_no_coverage_data_found: false }.to_not raise_error(RuntimeError)
       end
     end
   end
 end
 
 # rubocop:enable LineLength
+# rubocop:enable ModuleLength
 # rubocop:enable BlockLength

@@ -87,15 +87,15 @@ module Danger
       git = @dangerfile.git
       affected_files = git.modified_files + git.added_files
       affected_files.select { |file| files_extension.reduce(false) { |state, el| state || file.end_with?(el) } }
-          .map { |file| file.split('.').first.split(delimiter)[1] }
+                    .map { |file| file.split('.').first.split(delimiter)[1] }
     end
 
     # It returns a specific class code coverage and an emoji status as well
     def report_class(jacoco_class)
       report_result = {
-          covered: 'No coverage data found : -',
-          status: ':black_joker:',
-          required_coverage_percentage: 'No coverage data found : -'
+        covered: 'No coverage data found : -',
+        status: ':black_joker:',
+        required_coverage_percentage: 'No coverage data found : -'
       }
 
       counter = coverage_counter(jacoco_class)
@@ -107,9 +107,9 @@ module Danger
         status = coverage_status(coverage, required_coverage)
 
         report_result = {
-            covered: coverage,
-            status: status,
-            required_coverage_percentage: required_coverage
+          covered: coverage,
+          status: status,
+          required_coverage_percentage: required_coverage
         }
       end
 
@@ -150,8 +150,8 @@ module Danger
       coverage_status = coverage_status(covered_percentage, minimum_project_coverage_percentage)
 
       {
-          covered: covered_percentage,
-          status: coverage_status
+        covered: covered_percentage,
+        status: coverage_status
       }
     end
 
@@ -166,11 +166,9 @@ module Danger
       if counter.nil?
         no_coverage_data_found_message = "No coverage data found for #{jacoco_class.name}"
 
-        if @fail_no_coverage_data_found.class == TrueClass
-          raise no_coverage_data_found_message
-        else
-          warn no_coverage_data_found_message
-        end
+        raise no_coverage_data_found_message if @fail_no_coverage_data_found.class == TrueClass
+
+        warn no_coverage_data_found_message
       end
 
       counter
