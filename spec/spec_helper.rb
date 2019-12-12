@@ -18,6 +18,8 @@ RSpec.configure do |config|
   config.tty = true
 end
 
+RSpec::Expectations.configuration.on_potential_false_positives = :nothing
+
 require 'danger_plugin'
 
 # These functions are a subset of https://github.com/danger/danger/blob/master/spec/spec_helper.rb

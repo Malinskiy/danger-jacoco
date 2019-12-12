@@ -122,6 +122,42 @@ module Danger
 
         expect(@dangerfile.status_report[:markdowns][0].message).to include('| [`com/example/CachedRepository`](http://test.com/com.example/CachedRepository.html) | 50% | 80% | :warning: |')
       end
+
+      it 'When option "fail_no_coverage_data_found" is set to optionally fail, it doesn\'t fail the execution' do
+        path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
+
+        @my_plugin.minimum_class_coverage_percentage = 80
+        @my_plugin.minimum_project_coverage_percentage = 50
+
+        expect{@my_plugin.report(path_a, fail_no_coverage_data_found: true)}.to_not raise_error(RuntimeError)
+      end
+
+      it 'When option "fail_no_coverage_data_found" is not set, the execution fails on empty data' do
+        path_a = "#{File.dirname(__FILE__)}/fixtures/output_b.xml"
+
+        @my_plugin.minimum_class_coverage_percentage = 80
+        @my_plugin.minimum_project_coverage_percentage = 50
+
+        expect{@my_plugin.report path_a}.to raise_error(RuntimeError)
+      end
+
+      it 'When option "fail_no_coverage_data_found" is set to optionally fail, the execution fails on empty data' do
+        path_a = "#{File.dirname(__FILE__)}/fixtures/output_b.xml"
+
+        @my_plugin.minimum_class_coverage_percentage = 80
+        @my_plugin.minimum_project_coverage_percentage = 50
+
+        expect{@my_plugin.report path_a, fail_no_coverage_data_found: true}.to raise_error(RuntimeError)
+      end
+
+      it 'When option "fail_no_coverage_data_found" is set to optionally warn (not fail), the execution doesn\'t fail on empty data' do
+        path_a = "#{File.dirname(__FILE__)}/fixtures/output_b.xml"
+
+        @my_plugin.minimum_class_coverage_percentage = 80
+        @my_plugin.minimum_project_coverage_percentage = 50
+
+        expect{@my_plugin.report path_a, fail_no_coverage_data_found: false}.to_not raise_error(RuntimeError)
+      end
     end
   end
 end

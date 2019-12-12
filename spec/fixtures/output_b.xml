@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.0//EN"
+        "report.dtd">
+<report name="test_report">
+  <sessioninfo id="test-id" start="1480057517395" dump="1480057526412"/>
+  <package name="com/example">
+    <class name="com/example/CachedRepository">
+      <method name="&lt;init&gt;" desc="()V" line="17">
+        <counter type="INSTRUCTION" missed="0" covered="11"/>
+        <counter type="COMPLEXITY" missed="0" covered="1"/>
+        <counter type="METHOD" missed="0" covered="1"/>
+      </method>
+      <counter type="INSTRUCTION" missed="0" covered="46"/>
+      <counter type="COMPLEXITY" missed="5" covered="7"/>
+      <counter type="METHOD" missed="0" covered="7"/>
+      <counter type="CLASS" missed="0" covered="1"/>
+    </class>
+    <sourcefile name="CachedRepository.java">
+      <line nr="16" mi="0" ci="2" mb="0" cb="0"/>
+      <line nr="17" mi="0" ci="3" mb="0" cb="0"/>
+      <counter type="INSTRUCTION" missed="2" covered="98"/>
+      <counter type="COMPLEXITY" missed="2" covered="11"/>
+      <counter type="METHOD" missed="2" covered="11"/>
+      <counter type="CLASS" missed="2" covered="4"/>
+    </sourcefile>
+    <counter type="INSTRUCTION" missed="80" covered="324"/>
+    <counter type="COMPLEXITY" missed="11" covered="39"/>
+    <counter type="METHOD" missed="9" covered="37"/>
+    <counter type="CLASS" missed="2" covered="10"/>
+  </package>
+  <counter type="INSTRUCTION" missed="39399" covered="19321"/>
+  <counter type="COMPLEXITY" missed="5517" covered="1444"/>
+  <counter type="METHOD" missed="3382" covered="1120"/>
+  <counter type="CLASS" missed="491" covered="370"/>
+</report>
