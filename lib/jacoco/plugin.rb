@@ -163,11 +163,11 @@ module Danger
       counters = jacoco_class.counters
       branch_counter = counters.detect { |e| e.type.eql? 'BRANCH' }
       line_counter = counters.detect { |e| e.type.eql? 'LINE' }
-      if @prioritize_line_class_coverage
-        counter = line_counter
-      else
-        counter = branch_counter.nil? ? line_counter : branch_counter
-      end
+      counter = if @prioritize_line_class_coverage
+                  line_counter
+                else
+                  branch_counter.nil? ? line_counter : branch_counter
+                end
 
       if counter.nil?
         no_coverage_data_found_message = "No coverage data found for #{jacoco_class.name}"
