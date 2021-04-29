@@ -25,6 +25,7 @@ jacoco.minimum_class_coverage_map = { # optional (default is empty)
 jacoco.minimum_class_coverage_percentage = 75 # default 0
 jacoco.files_extension = [".java"] # default [".kt", ".java"]
 jacoco.report("path/to/jacoco.xml", "http://jacoco-html-reports/")
+jacoco.prioritize_line_class_coverage = true # default false
 ```
 
 to your `Dangerfile` 
