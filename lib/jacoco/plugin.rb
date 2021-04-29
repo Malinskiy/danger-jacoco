@@ -26,6 +26,7 @@ module Danger
     attr_accessor :minimum_package_coverage_map
     attr_accessor :minimum_class_coverage_map
     attr_accessor :fail_no_coverage_data_found
+    attr_accessor :prioritize_line_class_coverage
 
     # Initialize the plugin with configured parameters or defaults
     def setup
@@ -34,6 +35,7 @@ module Danger
       @minimum_package_coverage_map = {} unless minimum_package_coverage_map
       @minimum_class_coverage_map = {} unless minimum_class_coverage_map
       @files_extension = ['.kt', '.java'] unless files_extension
+      @prioritize_line_class_coverage = false unless prioritize_line_class_coverage
     end
 
     # Parses the xml output of jacoco to Ruby model classes
@@ -161,7 +163,11 @@ module Danger
       counters = jacoco_class.counters
       branch_counter = counters.detect { |e| e.type.eql? 'BRANCH' }
       line_counter = counters.detect { |e| e.type.eql? 'LINE' }
-      counter = branch_counter.nil? ? line_counter : branch_counter
+      counter = if @prioritize_line_class_coverage
+                  line_counter
+                else
+                  branch_counter.nil? ? line_counter : branch_counter
+                end
 
       if counter.nil?
         no_coverage_data_found_message = "No coverage data found for #{jacoco_class.name}"
