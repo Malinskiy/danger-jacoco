@@ -5,10 +5,10 @@ require 'nokogiri'
 module Jacoco
   # Sax parser for quickly finding class elements in Jacoco report
   class SAXParser < Nokogiri::XML::SAX::Document
-    attr_accessor :class_names
-    attr_accessor :classes
+    attr_accessor :class_names, :classes
 
     def initialize(classes)
+      super()
       @class_names      = classes
       @classes          = []
       @current_class    = nil
@@ -40,14 +40,13 @@ module Jacoco
     def start_class(attrs)
       @subelement_index = 0
 
-      if @class_names.include?(Hash[attrs]['name'])
-        c              = Jacoco::Class.new
-        c.name         = Hash[attrs]['name']
-        c.counters     = []
-        @current_class = c
-        @classes.push c
-      elsif @current_class.nil?
-      end
+      return unless @class_names.include?(Hash[attrs]['name'])
+
+      c              = Jacoco::Class.new
+      c.name         = Hash[attrs]['name']
+      c.counters     = []
+      @current_class = c
+      @classes.push c
     end
 
     def characters(string); end
