@@ -30,7 +30,7 @@ module Danger
       @minimum_package_coverage_map = {} unless minimum_package_coverage_map
       @minimum_class_coverage_map = {} unless minimum_class_coverage_map
       @files_extension = ['.kt', '.java'] unless files_extension
-      @title = "JaCoCo" unless title
+      @title = 'JaCoCo' unless title
     end
 
     # Parses the xml output of jacoco to Ruby model classes
