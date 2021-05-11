@@ -20,13 +20,8 @@ module Danger
   # @tags jacoco, coverage, java, android, kotlin
   #
   class DangerJacoco < Plugin # rubocop:disable Metrics/ClassLength
-    attr_accessor :minimum_project_coverage_percentage
-    attr_accessor :minimum_class_coverage_percentage
-    attr_accessor :files_extension
-    attr_accessor :minimum_package_coverage_map
-    attr_accessor :minimum_class_coverage_map
-    attr_accessor :fail_no_coverage_data_found
-    attr_accessor :title
+    attr_accessor :minimum_project_coverage_percentage, :minimum_class_coverage_percentage, :files_extension,
+                  :minimum_package_coverage_map, :minimum_class_coverage_map, :fail_no_coverage_data_found, :title
 
     # Initialize the plugin with configured parameters or defaults
     def setup
@@ -64,7 +59,7 @@ module Danger
     # Java => blah/blah/java/slashed_package/Source.java
     # Kotlin => blah/blah/kotlin/slashed_package/Source.kt
     #
-    def report(path, report_url = '', delimiter = %r{\/java\/|\/kotlin\/}, fail_no_coverage_data_found: true)
+    def report(path, report_url = '', delimiter = %r{/java/|/kotlin/}, fail_no_coverage_data_found: true)
       @fail_no_coverage_data_found = fail_no_coverage_data_found
 
       setup
@@ -168,7 +163,7 @@ module Danger
       if counter.nil?
         no_coverage_data_found_message = "No coverage data found for #{jacoco_class.name}"
 
-        raise no_coverage_data_found_message if @fail_no_coverage_data_found.class == TrueClass
+        raise no_coverage_data_found_message if @fail_no_coverage_data_found.instance_of?(TrueClass)
 
         warn no_coverage_data_found_message
       end
@@ -208,7 +203,7 @@ module Danger
       if report_url.empty?
         "`#{class_name}`"
       else
-        report_filepath = class_name.gsub(%r{/(?=[^/]*/.)}, '.') + '.html'
+        report_filepath = "#{class_name.gsub(%r{/(?=[^/]*/.)}, '.')}.html"
         "[`#{class_name}`](#{report_url + report_filepath})"
       end
     end

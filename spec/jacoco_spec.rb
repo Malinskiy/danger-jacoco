@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-# rubocop:disable LineLength
-# rubocop:disable ModuleLength
-# rubocop:disable BlockLength
+# rubocop:disable Layout/LineLength
+# rubocop:disable Metrics/ModuleLength
+# rubocop:disable Metrics/BlockLength
 
 require File.expand_path('spec_helper', __dir__)
 
@@ -162,6 +162,6 @@ module Danger
   end
 end
 
-# rubocop:enable LineLength
-# rubocop:enable ModuleLength
-# rubocop:enable BlockLength
+# rubocop:enable Layout/LineLength
+# rubocop:enable Metrics/ModuleLength
+# rubocop:enable Metrics/BlockLength
