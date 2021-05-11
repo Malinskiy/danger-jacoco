@@ -21,7 +21,7 @@ module Danger
   #
   class DangerJacoco < Plugin # rubocop:disable Metrics/ClassLength
     attr_accessor :minimum_project_coverage_percentage, :minimum_class_coverage_percentage, :files_extension,
-                  :minimum_package_coverage_map, :minimum_class_coverage_map, :fail_no_coverage_data_found
+                  :minimum_package_coverage_map, :minimum_class_coverage_map, :fail_no_coverage_data_found, :title
 
     # Initialize the plugin with configured parameters or defaults
     def setup
@@ -30,6 +30,7 @@ module Danger
       @minimum_package_coverage_map = {} unless minimum_package_coverage_map
       @minimum_class_coverage_map = {} unless minimum_class_coverage_map
       @files_extension = ['.kt', '.java'] unless files_extension
+      @title = "JaCoCo" unless title
     end
 
     # Parses the xml output of jacoco to Ruby model classes
@@ -69,7 +70,7 @@ module Danger
 
       total_covered = total_coverage(path)
 
-      report_markdown = "### JaCoCO Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
+      report_markdown = "### #{title} Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
       report_markdown += "| Class | Covered | Meta | Status |\n"
       report_markdown += "|:---|:---:|:---:|:---:|\n"
       class_coverage_above_minimum = markdown_class(parser, report_markdown, report_url)

@@ -37,7 +37,7 @@ module Danger
 
         expect(@dangerfile.status_report[:errors]).to eq(['Total coverage of 32.9%. Improve this to at least 50%',
                                                           'Class coverage is below minimum. Improve to at least 0%'])
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('### JaCoCO Code Coverage 32.9% :warning:')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('### JaCoCo Code Coverage 32.9% :warning:')
         expect(@dangerfile.status_report[:markdowns][0].message).to include('| Class | Covered | Meta | Status |')
         expect(@dangerfile.status_report[:markdowns][0].message).to include('|:---|:---:|:---:|:---:|')
         expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 100% | :warning: |')
