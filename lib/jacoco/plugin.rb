@@ -98,9 +98,7 @@ module Danger
       counter = coverage_counter(jacoco_class)
       unless counter.nil?
         coverage = (counter.covered.fdiv(counter.covered + counter.missed) * 100).floor
-        required_coverage = minimum_class_coverage_map[jacoco_class.name]
-        required_coverage = package_coverage(jacoco_class.name) if required_coverage.nil?
-        required_coverage = minimum_class_coverage_percentage if required_coverage.nil?
+        required_coverage = required_class_coverage(jacoco_class)
         status = coverage_status(coverage, required_coverage)
 
         report_result = {
@@ -111,6 +109,15 @@ module Danger
       end
 
       report_result
+    end
+
+    # Determines the required coverage for the class
+    def required_class_coverage(jacoco_class)
+      key = minimum_class_coverage_map.keys.detect { |k| jacoco_class.name.match(k) } || jacoco_class.name
+      required_coverage = minimum_class_coverage_map[key]
+      required_coverage = package_coverage(jacoco_class.name) if required_coverage.nil?
+      required_coverage = minimum_class_coverage_percentage if required_coverage.nil?
+      required_coverage
     end
 
     # it returns the most suitable coverage by package name to class or nil
