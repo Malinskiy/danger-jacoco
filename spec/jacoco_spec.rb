@@ -43,7 +43,7 @@ module Danger
         expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 100% | :warning: |')
       end
 
-      it 'test regex ' do
+      it 'test regex class coverage' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
         @my_plugin.minimum_project_coverage_percentage = 50
