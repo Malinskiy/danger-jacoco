@@ -169,6 +169,31 @@ module Danger
 
         expect { @my_plugin.report path_a, fail_no_coverage_data_found: false }.to_not raise_error(RuntimeError)
       end
+
+      it 'When option "warn_on_low_coverage" is set to false, the execution fails on low coverage' do
+        path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
+
+        @my_plugin.minimum_project_coverage_percentage = 50
+        @my_plugin.minimum_class_coverage_map = { 'com/example/CachedRepository' => 100 }
+
+        @my_plugin.report path_a
+
+        expect(@dangerfile.status_report[:errors]).to eq(['Total coverage of 32.9%. Improve this to at least 50%',
+                                                          'Class coverage is below minimum. Improve to at least 0%'])
+      end
+
+      it 'When option "warn_on_low_coverage" is set to true, the execution warns on low coverage' do
+        path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
+
+        @my_plugin.warn_on_low_coverage = true
+        @my_plugin.minimum_project_coverage_percentage = 50
+        @my_plugin.minimum_class_coverage_map = { 'com/example/CachedRepository' => 100 }
+
+        @my_plugin.report path_a
+
+        expect(@dangerfile.status_report[:warnings]).to eq(['Total coverage of 32.9%. Improve this to at least 50%',
+                                                          'Class coverage is below minimum. Improve to at least 0%'])
+      end
     end
   end
 end

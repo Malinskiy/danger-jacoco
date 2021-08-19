@@ -21,7 +21,8 @@ module Danger
   #
   class DangerJacoco < Plugin # rubocop:disable Metrics/ClassLength
     attr_accessor :minimum_project_coverage_percentage, :minimum_class_coverage_percentage, :files_extension,
-                  :minimum_package_coverage_map, :minimum_class_coverage_map, :fail_no_coverage_data_found, :title
+                  :minimum_package_coverage_map, :minimum_class_coverage_map, :fail_no_coverage_data_found, :title,
+                  :warn_on_low_coverage
 
     # Initialize the plugin with configured parameters or defaults
     def setup
@@ -31,6 +32,7 @@ module Danger
       @minimum_class_coverage_map = {} unless minimum_class_coverage_map
       @files_extension = ['.kt', '.java'] unless files_extension
       @title = 'JaCoCo' unless title
+      @warn_on_low_coverage = false unless warn_on_low_coverage
     end
 
     # Parses the xml output of jacoco to Ruby model classes
@@ -183,12 +185,12 @@ module Danger
       if total_covered[:covered] < minimum_project_coverage_percentage
         # fail danger if total coverage is smaller than minimum_project_coverage_percentage
         covered = total_covered[:covered]
-        fail("Total coverage of #{covered}%. Improve this to at least #{minimum_project_coverage_percentage}%")
+        finish_with_message("Total coverage of #{covered}%. Improve this to at least #{minimum_project_coverage_percentage}%")
       end
 
       return if class_coverage_above_minimum
 
-      fail("Class coverage is below minimum. Improve to at least #{minimum_class_coverage_percentage}%")
+      finish_with_message("Class coverage is below minimum. Improve to at least #{minimum_class_coverage_percentage}%")
     end
     # rubocop:enable Style/SignalException
 
@@ -212,6 +214,14 @@ module Danger
       else
         report_filepath = "#{class_name.gsub(%r{/(?=[^/]*/.)}, '.')}.html"
         "[`#{class_name}`](#{report_url + report_filepath})"
+      end
+    end
+
+    def finish_with_message(message)
+      if warn_on_low_coverage
+        warn(message)
+      else
+        fail(message)
       end
     end
   end
