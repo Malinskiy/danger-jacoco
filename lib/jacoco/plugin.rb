@@ -59,7 +59,7 @@ module Danger
     # Java => blah/blah/java/slashed_package/Source.java
     # Kotlin => blah/blah/kotlin/slashed_package/Source.kt
     #
-    def report(path, report_url = '', delimiter = %r{/java/|/kotlin/}, fail_no_coverage_data_found: true)
+    def report(path, report_url = '', delimiter = %r{/java/|/kotlin/|/scala/}, fail_no_coverage_data_found: true)
       @fail_no_coverage_data_found = fail_no_coverage_data_found
 
       setup
