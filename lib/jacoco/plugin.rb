@@ -138,7 +138,8 @@ module Danger
     def coverage_status(coverage, minimum_percentage)
       if coverage < (minimum_percentage / 2) then ':skull:'
       elsif coverage < minimum_percentage then ':warning:'
-      else ':white_check_mark:'
+      else
+        ':white_check_mark:'
       end
     end
 
