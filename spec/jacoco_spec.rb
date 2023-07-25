@@ -30,115 +30,115 @@ module Danger
       it :report do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_project_coverage_percentage = 50
-        @my_plugin.minimum_class_coverage_map = { 'com/example/CachedRepository' => 100 }
+        @my_plugin.enforced_project_coverage_percentage = 50
+        @my_plugin.enforced_class_coverage_map = { 'com/example/CachedRepository' => 100 }
 
         @my_plugin.report path_a
 
         expect(@dangerfile.status_report[:errors]).to eq(['Total coverage of 32.9%. Improve this to at least 50%',
                                                           'Class coverage is below minimum. Improve to at least 0%'])
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('### JaCoCo Code Coverage 32.9% :warning:')
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| Class | Covered | Meta | Status |')
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('|:---|:---:|:---:|:---:|')
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 100% | :warning: |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('### JaCoCo Code Coverage 32.9% :skull:')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| Class | Coverage | Enforced | Aspirational | Status |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('|:---|:---:|:---:|:---:|:---:|')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 100% | 0% | :skull: |')
       end
 
       it 'test regex class coverage' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_project_coverage_percentage = 50
-        @my_plugin.minimum_class_coverage_map = { '.*Repository' => 60 }
+        @my_plugin.enforced_project_coverage_percentage = 50
+        @my_plugin.enforced_class_coverage_map = { '.*Repository' => 60 }
 
         @my_plugin.report path_a
 
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 60% | :warning: |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 60% | 0% | :skull: |')
       end
 
       it 'test with package coverage' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_project_coverage_percentage = 50
-        @my_plugin.minimum_package_coverage_map = { 'com/example/' => 70 }
+        @my_plugin.enforced_project_coverage_percentage = 50
+        @my_plugin.enforced_package_coverage_map = { 'com/example/' => 70 }
 
         @my_plugin.report path_a
 
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 70% | :warning: |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 70% | 70% | :skull: |')
       end
 
       it 'test with bigger overlapped package coverage' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_project_coverage_percentage = 50
-        @my_plugin.minimum_package_coverage_map = {
+        @my_plugin.enforced_project_coverage_percentage = 50
+        @my_plugin.enforced_package_coverage_map = {
           'com/example/' => 70,
           'com/' => 90
         }
 
         @my_plugin.report path_a
 
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 70% | :warning: |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 70% | 70% | :skull: |')
       end
 
       it 'test with lower overlapped package coverage' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_project_coverage_percentage = 50
-        @my_plugin.minimum_package_coverage_map = {
+        @my_plugin.enforced_project_coverage_percentage = 50
+        @my_plugin.enforced_package_coverage_map = {
           'com/example/' => 77,
           'com/' => 30
         }
 
         @my_plugin.report path_a
 
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 77% | :warning: |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 77% | 77% | :skull: |')
       end
 
       it 'test with overlapped package coverage and bigger class coverage' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_project_coverage_percentage = 50
-        @my_plugin.minimum_package_coverage_map = {
+        @my_plugin.enforced_project_coverage_percentage = 50
+        @my_plugin.enforced_package_coverage_map = {
           'com/example/' => 77,
           'com/' => 30
         }
-        @my_plugin.minimum_class_coverage_map = { 'com/example/CachedRepository' => 100 }
+        @my_plugin.enforced_class_coverage_map = { 'com/example/CachedRepository' => 100 }
 
         @my_plugin.report path_a
 
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 100% | :warning: |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 100% | 77% | :skull: |')
       end
 
       it 'test with overlapped package coverage and lowwer class coverage' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_project_coverage_percentage = 50
-        @my_plugin.minimum_package_coverage_map = {
+        @my_plugin.enforced_project_coverage_percentage = 50
+        @my_plugin.enforced_package_coverage_map = {
           'com/example/' => 90,
           'com/' => 85
         }
-        @my_plugin.minimum_class_coverage_map = { 'com/example/CachedRepository' => 80 }
+        @my_plugin.enforced_class_coverage_map = { 'com/example/CachedRepository' => 80 }
 
         @my_plugin.report path_a
 
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 80% | :warning: |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 80% | 90% | :skull: |')
       end
 
       it 'adds a link to report' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_class_coverage_percentage = 80
-        @my_plugin.minimum_project_coverage_percentage = 50
+        @my_plugin.enforced_class_coverage_percentage = 80
+        @my_plugin.enforced_project_coverage_percentage = 50
 
         @my_plugin.report(path_a, 'http://test.com/')
 
-        expect(@dangerfile.status_report[:markdowns][0].message).to include('| [`com/example/CachedRepository`](http://test.com/com.example/CachedRepository.html) | 50% | 80% | :warning: |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| [`com/example/CachedRepository`](http://test.com/com.example/CachedRepository.html) | 50% | 80% | 0% | :skull: |')
       end
 
       it 'When option "fail_no_coverage_data_found" is set to optionally fail, it doesn\'t fail the execution' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
-        @my_plugin.minimum_class_coverage_percentage = 80
-        @my_plugin.minimum_project_coverage_percentage = 50
+        @my_plugin.enforced_class_coverage_percentage = 80
+        @my_plugin.enforced_project_coverage_percentage = 50
 
         expect { @my_plugin.report(path_a, fail_no_coverage_data_found: true) }.to_not raise_error(RuntimeError)
       end
@@ -146,8 +146,8 @@ module Danger
       it 'When option "fail_no_coverage_data_found" is not set, the execution fails on empty data' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_b.xml"
 
-        @my_plugin.minimum_class_coverage_percentage = 80
-        @my_plugin.minimum_project_coverage_percentage = 50
+        @my_plugin.enforced_class_coverage_percentage = 80
+        @my_plugin.enforced_project_coverage_percentage = 50
 
         expect { @my_plugin.report path_a }.to raise_error(RuntimeError)
       end
@@ -155,8 +155,8 @@ module Danger
       it 'When option "fail_no_coverage_data_found" is set to optionally fail, the execution fails on empty data' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_b.xml"
 
-        @my_plugin.minimum_class_coverage_percentage = 80
-        @my_plugin.minimum_project_coverage_percentage = 50
+        @my_plugin.enforced_class_coverage_percentage = 80
+        @my_plugin.enforced_project_coverage_percentage = 50
 
         expect { @my_plugin.report path_a, fail_no_coverage_data_found: true }.to raise_error(RuntimeError)
       end
@@ -164,8 +164,8 @@ module Danger
       it 'When option "fail_no_coverage_data_found" is set to optionally warn (not fail), the execution doesn\'t fail on empty data' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_b.xml"
 
-        @my_plugin.minimum_class_coverage_percentage = 80
-        @my_plugin.minimum_project_coverage_percentage = 50
+        @my_plugin.enforced_class_coverage_percentage = 80
+        @my_plugin.enforced_project_coverage_percentage = 50
 
         expect { @my_plugin.report path_a, fail_no_coverage_data_found: false }.to_not raise_error(RuntimeError)
       end

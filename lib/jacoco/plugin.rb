@@ -20,15 +20,28 @@ module Danger
   # @tags jacoco, coverage, java, android, kotlin
   #
   class DangerJacoco < Plugin # rubocop:disable Metrics/ClassLength
-    attr_accessor :minimum_project_coverage_percentage, :minimum_class_coverage_percentage, :files_extension,
-                  :minimum_package_coverage_map, :minimum_class_coverage_map, :fail_no_coverage_data_found, :title
+    attr_accessor :aspirational_project_coverage_percentage,
+                  :aspirational_class_coverage_percentage,
+                  :enforced_project_coverage_percentage,
+                  :enforced_class_coverage_percentage,
+                  :aspirational_package_coverage_map,
+                  :aspirational_class_coverage_map,
+                  :enforced_package_coverage_map,
+                  :enforced_class_coverage_map,
+                  :fail_no_coverage_data_found,
+                  :files_extension,
+                  :title
 
     # Initialize the plugin with configured parameters or defaults
     def setup
-      @minimum_project_coverage_percentage = 0 unless minimum_project_coverage_percentage
-      @minimum_class_coverage_percentage = 0 unless minimum_class_coverage_percentage
-      @minimum_package_coverage_map = {} unless minimum_package_coverage_map
-      @minimum_class_coverage_map = {} unless minimum_class_coverage_map
+      @aspirational_project_coverage_percentage = 0 unless aspirational_project_coverage_percentage
+      @aspirational_class_coverage_percentage = 0 unless aspirational_class_coverage_percentage
+      @enforced_project_coverage_percentage = 0 unless enforced_project_coverage_percentage
+      @enforced_class_coverage_percentage = 0 unless enforced_class_coverage_percentage
+      @aspirational_package_coverage_map = {} unless aspirational_package_coverage_map
+      @aspirational_class_coverage_map = {} unless aspirational_class_coverage_map
+      @enforced_package_coverage_map = {} unless enforced_package_coverage_map
+      @enforced_class_coverage_map = {} unless enforced_class_coverage_map
       @files_extension = ['.kt', '.java'] unless files_extension
       @title = 'JaCoCo' unless title
     end
@@ -71,8 +84,8 @@ module Danger
       total_covered = total_coverage(path)
 
       report_markdown = "### #{title} Code Coverage #{total_covered[:covered]}% #{total_covered[:status]}\n"
-      report_markdown += "| Class | Covered | Meta | Status |\n"
-      report_markdown += "|:---|:---:|:---:|:---:|\n"
+      report_markdown += "| Class | Coverage | Enforced | Aspirational | Status |\n"
+      report_markdown += "|:---|:---:|:---:|:---:|:---:|\n"
       class_coverage_above_minimum = markdown_class(parser, report_markdown, report_url)
       markdown(report_markdown)
 
@@ -90,34 +103,28 @@ module Danger
     # It returns a specific class code coverage and an emoji status as well
     def report_class(jacoco_class)
       report_result = {
-        covered: 'No coverage data found : -',
+        coverage: 'No coverage data found : -',
         status: ':black_joker:',
-        required_coverage_percentage: 'No coverage data found : -'
+        enforced_coverage: 'No coverage data found : -',
+        aspirational_coverage: 'No coverage data found : -'
       }
 
       counter = coverage_counter(jacoco_class)
       unless counter.nil?
         coverage = (counter.covered.fdiv(counter.covered + counter.missed) * 100).floor
-        required_coverage = required_class_coverage(jacoco_class)
-        status = coverage_status(coverage, required_coverage)
+        enforced_class_coverage = enforced_class_coverage(jacoco_class)
+        aspirational_class_coverage = aspirational_class_coverage(jacoco_class)
+        status = coverage_status(coverage, enforced_class_coverage, aspirational_class_coverage)
 
         report_result = {
-          covered: coverage,
+          coverage: coverage,
           status: status,
-          required_coverage_percentage: required_coverage
+          enforced_coverage: enforced_class_coverage,
+          aspirational_coverage: aspirational_class_coverage
         }
       end
 
       report_result
-    end
-
-    # Determines the required coverage for the class
-    def required_class_coverage(jacoco_class)
-      key = minimum_class_coverage_map.keys.detect { |k| jacoco_class.name.match(k) } || jacoco_class.name
-      required_coverage = minimum_class_coverage_map[key]
-      required_coverage = package_coverage(jacoco_class.name) if required_coverage.nil?
-      required_coverage = minimum_class_coverage_percentage if required_coverage.nil?
-      required_coverage
     end
 
     # it returns the most suitable coverage by package name to class or nil
@@ -127,7 +134,7 @@ module Danger
       package_parts.reverse_each do |item|
         size = item.size
         path = path[0...-size]
-        coverage = minimum_package_coverage_map[path]
+        coverage = enforced_package_coverage_map[path]
         path = path[0...-1] unless path.empty?
         return coverage unless coverage.nil?
       end
@@ -135,9 +142,9 @@ module Danger
     end
 
     # it returns an emoji for coverage status
-    def coverage_status(coverage, minimum_percentage)
-      if coverage < (minimum_percentage / 2) then ':skull:'
-      elsif coverage < minimum_percentage then ':warning:'
+    def coverage_status(coverage, enforced_coverage, aspirational_coverage)
+      if coverage < enforced_coverage then ':skull:'
+      elsif coverage < aspirational_coverage then ':warning:'
       else
         ':white_check_mark:'
       end
@@ -152,7 +159,11 @@ module Danger
       covered_instructions = report.first['covered'].to_f
       total_instructions = missed_instructions + covered_instructions
       covered_percentage = (covered_instructions * 100 / total_instructions).round(2)
-      coverage_status = coverage_status(covered_percentage, minimum_project_coverage_percentage)
+      coverage_status = coverage_status(
+        covered_percentage,
+        enforced_project_coverage_percentage,
+        aspirational_project_coverage_percentage
+      )
 
       {
         covered: covered_percentage,
@@ -161,6 +172,30 @@ module Danger
     end
 
     private
+    #
+    # A function
+    #
+    # Params:
+    # +jacoco_class+:: The c
+    #
+    # Returns:
+    #   The enforced coverage percentage for the class based on the configurations of
+    def enforced_class_coverage(jacoco_class)
+      key = enforced_class_coverage_map.keys.detect { |k| jacoco_class.name.match(k) } || jacoco_class.name
+      enforced_coverage = enforced_class_coverage_map[key]
+      enforced_coverage = package_coverage(jacoco_class.name) if enforced_coverage.nil?
+      enforced_coverage = enforced_class_coverage_percentage if enforced_coverage.nil?
+      enforced_coverage
+    end
+
+    # Determines the required coverage for the class
+    def aspirational_class_coverage(jacoco_class)
+      key = aspirational_class_coverage_map.keys.detect { |k| jacoco_class.name.match(k) } || jacoco_class.name
+      aspirational_coverage = aspirational_class_coverage_map[key]
+      aspirational_coverage = package_coverage(jacoco_class.name) if aspirational_coverage.nil?
+      aspirational_coverage = aspirational_class_coverage_percentage if aspirational_coverage.nil?
+      aspirational_coverage
+    end
 
     def coverage_counter(jacoco_class)
       counters = jacoco_class.counters
@@ -181,15 +216,15 @@ module Danger
 
     # rubocop:disable Style/SignalException
     def report_fails(class_coverage_above_minimum, total_covered)
-      if total_covered[:covered] < minimum_project_coverage_percentage
+      if total_covered[:covered] < enforced_project_coverage_percentage
         # fail danger if total coverage is smaller than minimum_project_coverage_percentage
         covered = total_covered[:covered]
-        fail("Total coverage of #{covered}%. Improve this to at least #{minimum_project_coverage_percentage}%")
+        fail("Total coverage of #{covered}%. Improve this to at least #{enforced_project_coverage_percentage}%")
       end
 
       return if class_coverage_above_minimum
 
-      fail("Class coverage is below minimum. Improve to at least #{minimum_class_coverage_percentage}%")
+      fail("Class coverage is below minimum. Improve to at least #{enforced_class_coverage_percentage}%")
     end
     # rubocop:enable Style/SignalException
 
@@ -198,10 +233,10 @@ module Danger
       parser.classes.each do |jacoco_class| # Check metrics for each classes
         rp = report_class(jacoco_class)
         rl = report_link(jacoco_class.name, report_url)
-        ln = "| #{rl} | #{rp[:covered]}% | #{rp[:required_coverage_percentage]}% | #{rp[:status]} |\n"
+        ln = "| #{rl} | #{rp[:coverage]}% | #{rp[:enforced_coverage]}% | #{rp[:aspirational_coverage]}% | #{rp[:status]} |\n"
         report_markdown << ln
 
-        class_coverage_above_minimum &&= rp[:covered] >= rp[:required_coverage_percentage]
+        class_coverage_above_minimum &&= rp[:coverage] >= rp[:enforced_coverage]
       end
 
       class_coverage_above_minimum
