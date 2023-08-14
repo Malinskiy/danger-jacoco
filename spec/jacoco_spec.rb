@@ -108,7 +108,7 @@ module Danger
         expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 100% | :warning: |')
       end
 
-      it 'test with overlapped package coverage and lowwer class coverage' do
+      it 'test with overlapped package coverage and lower class coverage' do
         path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
 
         @my_plugin.minimum_project_coverage_percentage = 50
@@ -168,6 +168,22 @@ module Danger
         @my_plugin.minimum_project_coverage_percentage = 50
 
         expect { @my_plugin.report path_a, fail_no_coverage_data_found: false }.to_not raise_error(RuntimeError)
+      end
+
+      it 'warns instead of fails on class coverage with warn_on_class_coverage_below_minimum_coverage set to true' do
+        path_a = "#{File.dirname(__FILE__)}/fixtures/output_a.xml"
+
+        @my_plugin.minimum_project_coverage_percentage = 20
+        @my_plugin.minimum_class_coverage_map = { '.*Repository' => 100 }
+
+        @my_plugin.report(path_a, warn_on_class_coverage_below_minimum_coverage: true)
+
+        expect(@dangerfile.status_report[:errors]).to eq([])
+        expect(@dangerfile.status_report[:warnings]).to eq(['Class coverage is below minimum. Improve to at least 0%'])
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('### JaCoCo Code Coverage 32.9% :white_check_mark:')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| Class | Covered | Meta | Status |')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('|:---|:---:|:---:|:---:|')
+        expect(@dangerfile.status_report[:markdowns][0].message).to include('| `com/example/CachedRepository` | 50% | 100% | :warning: |')
       end
     end
   end
